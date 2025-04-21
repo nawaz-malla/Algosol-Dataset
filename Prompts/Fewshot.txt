@@ -1,0 +1,244 @@
+### **Task:**  
+Convert the following Solidity smart contract into an equivalent Algorand Python smart contract.
+
+---
+
+### **Example 1: Solidity to Algorand Python Translation**
+#### Solidity Contract:
+pragma solidity 0.6.9;
+pragma experimental ABIEncoderV2;
+
+contract Ownable {
+    address public _OWNER_;
+    address public _NEW_OWNER_;
+
+    // ============ Events ============
+
+    event OwnershipTransferPrepared(address indexed previousOwner, address indexed newOwner);
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    // ============ Modifiers ============
+
+    modifier onlyOwner() {
+        require(msg.sender == _OWNER_, "NOT_OWNER");
+        _;
+    }
+
+    // ============ Functions ============
+
+    constructor() internal {
+        _OWNER_ = msg.sender;
+        emit OwnershipTransferred(address(0), _OWNER_);
+    }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "INVALID_OWNER");
+        emit OwnershipTransferPrepared(_OWNER_, newOwner);
+        _NEW_OWNER_ = newOwner;
+    }
+
+    function claimOwnership() external {
+        require(msg.sender == _NEW_OWNER_, "INVALID_CLAIM");
+        emit OwnershipTransferred(_OWNER_, _NEW_OWNER_);
+        _OWNER_ = _NEW_OWNER_;
+        _NEW_OWNER_ = address(0);
+    }
+}
+
+Equivalent algorand python
+
+
+from algopy import Account, ARC4Contract, Bytes, Global, Txn, arc4, subroutine
+
+# Define event structs at module level
+class OwnershipTransferred(arc4.Struct):
+    previous_owner: arc4.Address
+    new_owner: arc4.Address
+
+class OwnershipTransferPrepared(arc4.Struct):
+    previous_owner: arc4.Address
+    new_owner: arc4.Address
+
+class Ownable(ARC4Contract):
+    """
+    @title Ownable
+    @author DODO Breeder (Algorand Python port)
+    @notice Ownership related functions
+    """
+
+    def __init__(self) -> None:
+        # Initialize owner to the creator of the contract
+        self.owner = Global.creator_address
+        # Initialize new owner to zero address
+        self.new_owner = Account(Bytes(b"\x00" * 32))  # Zero address
+        
+    @subroutine
+    def only_owner(self) -> None:
+        """Modifier equivalent to check if sender is owner"""
+        assert Txn.sender == self.owner, "NOT_OWNER"
+
+    @arc4.abimethod(create="require")
+    def init(self) -> None:
+        """
+        Constructor equivalent - initializes the contract
+        Emits OwnershipTransferred event from zero address to creator
+        """
+        arc4.emit(OwnershipTransferred(
+            previous_owner=arc4.Address(Bytes(b"\x00" * 32)), 
+            new_owner=arc4.Address(self.owner.bytes)
+        ))
+
+    @arc4.abimethod
+    def transfer_ownership(self, new_owner: arc4.Address) -> None:
+        """
+        Initiates ownership transfer to a new address
+        @param new_owner: The address to transfer ownership to
+        """
+        # Check sender is current owner
+        self.only_owner()
+        
+        # Check new owner is not zero address
+        assert new_owner != arc4.Address(Bytes(b"\x00" * 32)), "INVALID_OWNER"
+        
+        # Store the new owner
+        self.new_owner = Account(new_owner.bytes)
+        
+        arc4.emit(OwnershipTransferPrepared(
+            previous_owner=arc4.Address(self.owner.bytes),
+            new_owner=new_owner
+        ))
+
+    @arc4.abimethod
+    def claim_ownership(self) -> None:
+        """
+        Completes the ownership transfer process. Must be called by the new owner.
+        """
+        # Check sender is pending new owner
+        assert Txn.sender == self.new_owner, "INVALID_CLAIM"
+        
+        arc4.emit(OwnershipTransferred(
+            previous_owner=arc4.Address(self.owner.bytes),
+            new_owner=arc4.Address(self.new_owner.bytes)
+        ))
+        
+        # Update owner to new owner
+        self.owner = self.new_owner
+        
+        # Reset new owner to zero address
+        self.new_owner = Account(Bytes(b"\x00" * 32))
+
+
+Example 2
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HelloWorld {
+    event LogMessage(string message);
+
+    function sayHello(string memory name) public returns (bool) {
+        string memory message = string(abi.encodePacked("Hello, ", name));
+        emit LogMessage(message); 
+        return true;
+    }
+
+    function clearState() public pure returns (bool) {
+        return true; 
+    }
+}
+
+Equivalent algorand python
+
+
+from algopy import ARC4Contract, String
+from algopy.arc4 import abimethod
+
+
+class HelloWorld(ARC4Contract):
+    @abimethod()
+    def hello(self, name: String) -> String:
+        return "Hello, " + name
+
+
+Now, translate the solidity smart contract into an equivalent Algorand Python smart contract.
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Auction {
+    uint256 public auctionEndBlock;
+    uint256 public previousBid;
+    uint256 public asaAmount;
+    address public previousBidder;
+    uint256 public assetId;
+    address public creator;
+    bool public isAuctionActive = true;
+
+    mapping(address => uint256) public claimableAmounts;
+
+    modifier onlyCreator() {
+        require(msg.sender == creator, "Only creator can call this");
+        _;
+    }
+
+    modifier onlyWhenActive() {
+        require(isAuctionActive, "Auction is not active");
+        _;
+    }
+
+    constructor() {
+        creator = msg.sender;
+    }
+
+    function optIntoAsset(uint256 _assetId) external onlyCreator {
+        require(assetId == 0, "Asset already opted in");
+        assetId = _assetId;
+    }
+
+    function startAuction(uint256 startingPrice, uint256 blockDuration, uint256 assetAmount) 
+        external 
+        onlyCreator 
+        onlyWhenActive 
+    {
+        require(auctionEndBlock == 0, "Auction already started");
+        asaAmount = assetAmount;
+        auctionEndBlock = block.number + blockDuration;
+        previousBid = startingPrice;
+    }
+
+    function bid() external payable onlyWhenActive {
+        require(block.number < auctionEndBlock, "Auction has ended");
+        require(msg.value > previousBid, "Bid must be higher than previous bid");
+
+        if (previousBidder != address(0)) {
+            claimableAmounts[previousBidder] += previousBid;
+        }
+
+        previousBid = msg.value;
+        previousBidder = msg.sender;
+    }
+
+    function claimBids() external {
+        uint256 amount = claimableAmounts[msg.sender];
+        require(amount > 0, "No claimable amount");
+
+        claimableAmounts[msg.sender] = 0;
+        (bool sent, ) = msg.sender.call{value: amount}("");
+        require(sent, "Transfer failed");
+    }
+
+    function claimAsset() external {
+        require(block.number > auctionEndBlock, "Auction has not ended");
+        require(msg.sender == previousBidder, "Only winner can claim asset");
+
+    }
+
+    function deleteAuction() external onlyCreator {
+        isAuctionActive = false;
+        payable(creator).transfer(address(this).balance);
+    }
+}
+
+

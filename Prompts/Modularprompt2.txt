@@ -1,0 +1,140 @@
+### **Task: Convert Solidity Smart Contract to Algorand Python **
+
+### **Input: Solidity Smart Contract**
+Below is a Solidity smart contract. Convert it into an equivalent Algorand Python smart contract while following a structured approach using algopy not Algorand Python.
+--------------------------------------------------------------------------------------
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Auction {
+    uint256 public auctionEndBlock;
+    uint256 public previousBid;
+    uint256 public asaAmount;
+    address public previousBidder;
+    uint256 public assetId;
+    address public creator;
+    bool public isAuctionActive = true;
+
+    mapping(address => uint256) public claimableAmounts;
+
+    modifier onlyCreator() {
+        require(msg.sender == creator, "Only creator can call this");
+        _;
+    }
+
+    modifier onlyWhenActive() {
+        require(isAuctionActive, "Auction is not active");
+        _;
+    }
+
+    constructor() {
+        creator = msg.sender;
+    }
+
+    function optIntoAsset(uint256 _assetId) external onlyCreator {
+        require(assetId == 0, "Asset already opted in");
+        assetId = _assetId;
+    }
+
+    function startAuction(uint256 startingPrice, uint256 blockDuration, uint256 assetAmount) 
+        external 
+        onlyCreator 
+        onlyWhenActive 
+    {
+        require(auctionEndBlock == 0, "Auction already started");
+        asaAmount = assetAmount;
+        auctionEndBlock = block.number + blockDuration;
+        previousBid = startingPrice;
+    }
+
+    function bid() external payable onlyWhenActive {
+        require(block.number < auctionEndBlock, "Auction has ended");
+        require(msg.value > previousBid, "Bid must be higher than previous bid");
+
+        if (previousBidder != address(0)) {
+            claimableAmounts[previousBidder] += previousBid;
+        }
+
+        previousBid = msg.value;
+        previousBidder = msg.sender;
+    }
+
+    function claimBids() external {
+        uint256 amount = claimableAmounts[msg.sender];
+        require(amount > 0, "No claimable amount");
+
+        claimableAmounts[msg.sender] = 0;
+        (bool sent, ) = msg.sender.call{value: amount}("");
+        require(sent, "Transfer failed");
+    }
+
+    function claimAsset() external {
+        require(block.number > auctionEndBlock, "Auction has not ended");
+        require(msg.sender == previousBidder, "Only winner can claim asset");
+
+    }
+
+    function deleteAuction() external onlyCreator {
+        isAuctionActive = false;
+        payable(creator).transfer(address(this).balance);
+    }
+}
+
+
+
+--------------------------------------------------------------------------------------
+
+### **Step 1: Identify Solidity Components**
+Analyze the Solidity smart contract and identify the following:
+- **State Variables**: List all storage variables and their data types.
+- **Functions & Their Purpose**: Break down each function and explain what it does.
+- **Special Features**: Identify payable functions, events, inheritance, or mappings.
+
+---
+
+### **Step 2: Map Solidity Features to Algorand Algorand Python Equivalents**
+For each Solidity feature, find the corresponding Algorand Python equivalent. Use the following table format:
+
+| **Solidity Feature**   | **Algorand Algorand Python Equivalent**  |
+|------------------------|----------------------------------|
+| State variables (storage) | `App.globalPut()` / `App.globalDict()` |
+| `msg.sender`  | `Txn.sender()` |
+| `require(condition)` | `Assert(condition)` |
+| `payable` functions | `Txn.amount()` |
+| `mapping(address => uint256)` | `globalstate(abi.Address, abi.Uint64)` |
+| Events (`emit Event`) | `log(Bytes("event_name"))` |
+| Smart contract ownership | `App.globalGet(Bytes("owner"))` |
+| Constructor | `App.globalPut(Bytes("owner"), Txn.sender())` |
+
+---
+
+### **Step 3: Define the Algorand Python  Contract Structure**
+- Create a **class-based Algorand Python contract** using `ARC4Contract`.
+- Initialize **state variables** 
+- Use `@ABIMethod()` for defining smart contract functions.
+
+---
+
+### **Step 4: Implement Transaction Logic**
+- Implement **equivalent functions** in Algorand Python.
+- Ensure **security features** (e.g., balance checks, ownership validation).
+- Handle **state updates** and **storage retrieval** correctly.
+
+---
+
+### **Step 5: Validate & Optimize**
+- **Ensure correctness**: Verify that logic matches the Solidity contract.
+- **Optimize storage usage**: Use `Box Storage` if needed.
+- **Minimize TEAL execution cost**: Avoid unnecessary state updates.
+
+---
+
+### **Output: Equivalent algorand Python Smart Contract**
+Return the complete Algorand Python smart contract code in Python.
+Ensure it:
+✔ Matches the Solidity contract functionality.  
+✔ Uses correct Algorand best practices.  
+✔ Is optimized for TEAL execution efficiency.
+

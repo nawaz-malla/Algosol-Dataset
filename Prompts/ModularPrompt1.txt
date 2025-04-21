@@ -1,0 +1,117 @@
+### Task:
+Convert the following Solidity smart contract into an equivalent Algorand Python smart contract.
+
+### Solidity Smart Contract:
+------------------------------------------------
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Auction {
+    uint256 public auctionEndBlock;
+    uint256 public previousBid;
+    uint256 public asaAmount;
+    address public previousBidder;
+    uint256 public assetId;
+    address public creator;
+    bool public isAuctionActive = true;
+
+    mapping(address => uint256) public claimableAmounts;
+
+    modifier onlyCreator() {
+        require(msg.sender == creator, "Only creator can call this");
+        _;
+    }
+
+    modifier onlyWhenActive() {
+        require(isAuctionActive, "Auction is not active");
+        _;
+    }
+
+    constructor() {
+        creator = msg.sender;
+    }
+
+    function optIntoAsset(uint256 _assetId) external onlyCreator {
+        require(assetId == 0, "Asset already opted in");
+        assetId = _assetId;
+    }
+
+    function startAuction(uint256 startingPrice, uint256 blockDuration, uint256 assetAmount) 
+        external 
+        onlyCreator 
+        onlyWhenActive 
+    {
+        require(auctionEndBlock == 0, "Auction already started");
+        asaAmount = assetAmount;
+        auctionEndBlock = block.number + blockDuration;
+        previousBid = startingPrice;
+    }
+
+    function bid() external payable onlyWhenActive {
+        require(block.number < auctionEndBlock, "Auction has ended");
+        require(msg.value > previousBid, "Bid must be higher than previous bid");
+
+        if (previousBidder != address(0)) {
+            claimableAmounts[previousBidder] += previousBid;
+        }
+
+        previousBid = msg.value;
+        previousBidder = msg.sender;
+    }
+
+    function claimBids() external {
+        uint256 amount = claimableAmounts[msg.sender];
+        require(amount > 0, "No claimable amount");
+
+        claimableAmounts[msg.sender] = 0;
+        (bool sent, ) = msg.sender.call{value: amount}("");
+        require(sent, "Transfer failed");
+    }
+
+    function claimAsset() external {
+        require(block.number > auctionEndBlock, "Auction has not ended");
+        require(msg.sender == previousBidder, "Only winner can claim asset");
+
+    }
+
+    function deleteAuction() external onlyCreator {
+        isAuctionActive = false;
+        payable(creator).transfer(address(this).balance);
+    }
+}
+
+------------------------------------------------
+
+### **Step-by-Step Thought Process**  
+We will break down the translation into the following **modules**:
+
+1️ **Module 1: Identify Solidity Components**  
+   - List all **state variables** and their data types.  
+   - Identify **functions** and their purposes.  
+   - Detect **modifiers, inheritance, and events**.  
+
+2️ **Module 2: Map Solidity Features to Algorand Equivalents**  
+   - Convert Solidity's **storage (state variables, mappings)** to **Algorand state**.  
+   - Convert **msg.sender, require, payable** to their Algorand Python equivalents.  
+   - Handle Solidity **events** with **Algorand logs**.  
+
+3️ **Module 3: Define the Algorand Python Contract Structure**  
+   - Implement an **Algorand contract class** with `ARC4Contract`.  
+   - Use `@ABIMethod()` for functions.  
+   - Ensure **stateful storage** is handled correctly.  
+
+4️ **Module 4: Implement Transaction Logic**  
+   - Handle **token transfers, ownership verification, and conditions**.  
+   - Ensure **security checks** are properly mapped.  
+   - Optimize contract structure for **efficiency and cost**.  
+
+5️ **Module 5: Validate and Optimize**  
+   - Ensure **correct transaction flow**.  
+   - Optimize for **TEAL limits** (storage and computation).  
+   - Add **error handling** for edge cases.  
+
+---
+
+## **🔹 Example Answer**
+```python
+(Algorand Python  equivalent of the Solidity contract)
