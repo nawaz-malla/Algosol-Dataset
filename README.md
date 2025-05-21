@@ -43,7 +43,7 @@ This work can be useful for:
 If you use or reference this repository in your work, please cite the following paper:
 
 Title:
-[LLM-Based Translation of Ethereum Solidity Contracts to Algorand Python]
+LLM-Based Translation of Ethereum Solidity Contracts to Algorand Python
 
 
 ---
