@@ -106,7 +106,7 @@ For each Solidity feature, find the corresponding Algorand Python equivalent. Us
 | `mapping(address => uint256)` | `globalstate(abi.Address, abi.Uint64)` |
 | Events (`emit Event`) | `log(Bytes("event_name"))` |
 | Smart contract ownership | `App.globalGet(Bytes("owner"))` |
-| Constructor | `App.globalPut(Bytes("owner"), Txn.sender())` |
+
 
 ---
 

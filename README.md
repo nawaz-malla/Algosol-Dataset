@@ -12,9 +12,9 @@ The primary goal of this project is to evaluate the feasibility and performance 
 
 This repository includes:
 
-- ✅ Original smart contracts written in **Solidity** for the Ethereum Virtual Machine (EVM).
-- 🔁 Their translated equivalents in **Algorand Python** (using ARC4 conventions).
-- 💬 The **LLM prompts** used for the translation process.
+-  Original smart contracts written in **Solidity** for the Ethereum Virtual Machine (EVM).
+-  Their translated equivalents in **Algorand Python** (using ARC4 conventions).
+-  The **LLM prompts** used for the translation process.
 
 ---
 
@@ -43,8 +43,7 @@ This work can be useful for:
 If you use or reference this repository in your work, please cite the following paper:
 
 Title:
-LLM-Based Translation of Ethereum Solidity Contracts to Algorand Python
-
+[LLM-Based Translation of Ethereum Solidity Contracts to Algorand Python](https://github.com/nawaz-malla/Algosol-Dataset/)
 
 ---
 
