@@ -1,5 +1,5 @@
 ### **Task:**  
-Convert the following Solidity smart contract into an equivalent Algorand Python smart contract.
+Translation of Solidity smart contract into an equivalent Algorand Python smart contract.
 
 ---
 
