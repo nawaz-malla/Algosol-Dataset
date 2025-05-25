@@ -162,7 +162,30 @@ class HelloWorld(ARC4Contract):
 
 
 
-Now Translate the following Solidity smart contract into an equivalent Algorand Python smart contract.
+Now Translate the following Solidity smart contract into an equivalent Algorand Python smart contract following the step by step reasoning.
+Step-by-Step Reasoning:
+step 1. Identify Key Solidity Features
+   - What are the contract's functions?  
+   - What are the state variables?  
+   - Does it use inheritance, mappings, or payable functions?
+  
+
+step 2. Find Algorand Equivalents
+   - Convert Solidity contract structure to Algorand python using algopy class.  
+   - Replace `payable` functions with `Txn.amount()`.  
+   - Convert Solidity's `msg.sender` to `Txn.sender()`.  
+   - Replace Solidity mappings with `Boxmap` or `Box Storage`.  
+
+step 3. Write Algorand python Code 
+   - Implement contract logic in algorand python.  
+   - Ensure transaction security and permissions.  
+
+step 4. Verify and Optimize  
+   - Ensure contract logic follows Algorand python constraints. 
+   - Ensure the correct import statements and data types.
+   - Don't mix up algorand python and python data types. 
+   - Optimize state storage and fees.  
+
 
 Solidity Smart Contract:
 ------------------------------------------------
@@ -243,31 +266,3 @@ contract Auction {
     }
 }
 
-
-------------------------------------------------
-
-Step-by-Step Reasoning:
-step 1. Identify Key Solidity Features
-   - What are the contract's functions?  
-   - What are the state variables?  
-   - Does it use inheritance, mappings, or payable functions?
-  
-
-step 2. Find Algorand Equivalents
-   - Convert Solidity contract structure to Algorand python using algopy class.  
-   - Replace `payable` functions with `Txn.amount()`.  
-   - Convert Solidity's `msg.sender` to `Txn.sender()`.  
-   - Replace Solidity mappings with `Boxmap` or `Box Storage`.  
-
-step 3. Write Algorand python Code 
-   - Implement contract logic in algorand python.  
-   - Ensure transaction security and permissions.  
-
-step 4. Verify and Optimize  
-   - Ensure contract logic follows Algorand python constraints. 
-   - Ensure the correct import statements and data types.
-   - Don't mix up algorand python and python data types. 
-   - Optimize state storage and fees.  
-
-Answer:
-Provide the translated Algorand Python code
