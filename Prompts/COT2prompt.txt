@@ -1,3 +1,5 @@
+
+This prompt was not used in experimentation.
 Task:
 Translate the following Solidity smart contract into an equivalent Algorand Python smart contract.
 
