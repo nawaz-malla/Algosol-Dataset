@@ -1,6 +1,5 @@
-Translate the following Solidity smart contract into an equivalent Algorand Python smart contract using 
+Translate the following Solidity smart contract into an equivalent Algorand Python smart contract following Step-by-Step Reasoning:
 
-Step-by-Step Reasoning:
 step 1. Identify Key Solidity Features
    - What are the contract's functions?  
    - What are the state variables?  
