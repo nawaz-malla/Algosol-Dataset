@@ -163,7 +163,7 @@ class HelloWorld(ARC4Contract):
 
 
 Now Translate the following Solidity smart contract into an equivalent Algorand Python smart contract following the step by step reasoning.
-Step-by-Step Reasoning:
+
 step 1. Identify Key Solidity Features
    - What are the contract's functions?  
    - What are the state variables?  
