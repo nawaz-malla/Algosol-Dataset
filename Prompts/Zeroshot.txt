@@ -1,5 +1,5 @@
 ### **Task:**  
-Convert the following Solidity smart contract into an equivalent Algorand Python smart contract.
+Convert the following Solidity smart contract into an equivalent Algorand Python smart contract. Algorand blockchain uses the algorand python programming language. It is a partial implementation of the Python programming language that runs on the AVM.
 
 ### **Solidity Smart Contract:**
 
@@ -84,9 +84,4 @@ contract Auction {
 
 ---------------------------------------------------------------------------------------------
 
-### **Instructions:**
-- Identify Solidity **state variables, functions, and logic**.
-- Map Solidity features to **Algorand equivalents**.
-- Implement the Algorand Python smart contract **using ARC4Contract**.
-- Ensure **correct state management**.
-- Optimize for **Algorand’s TEAL limitations**.
+
